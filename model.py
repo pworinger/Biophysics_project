@@ -9,7 +9,8 @@ class Model():
 
     def create_full_graph(self, path_edge_list):
         df = pd.read_csv(path_edge_list, sep="\t")
-        return nx.from_pandas_edgelist(df, source="cause", target="effect", edge_attr=["linear", "quad"])
+        df.columns = ["cause","effect","alpha","beta"]
+        return nx.from_pandas_edgelist(df, source="cause", target="effect", edge_attr=["alpha", "beta"], create_using=nx.DiGraph())
 
     lst = ['CLN3', 'CLN1', 'CLN2', 'CDH1', 'SWI5', 'CDC20', 'CLB5', 'CLB6', 'SIC1', 'CLB1', 'CLB2', 'MCM1']
 
