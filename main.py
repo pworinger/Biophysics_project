@@ -1,5 +1,5 @@
 from model import Model
 
 m = Model()
-m.initialize()
-m.evolve()
+print(m.data.nodes())
+print(m.data.edges())
