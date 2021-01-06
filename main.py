@@ -2,7 +2,7 @@ import networkx as nx
 from model import Model
 import numpy as np
 
-m = Model()
+m = Model(perturbed_gene=10)
 
 # print(m.graph.nodes())
 # print(m.graph.edges())
@@ -19,9 +19,21 @@ m = Model()
 # print(type(m.alpha))
 # print(m.alpha)
 
+
+#-----------------testing_evolve------------------------------------------
+
+# temp = np.copy(m.y)
+
+
+# m.evolve(10)
+
+# print(np.concatenate((temp.reshape(len(temp),1), m.y.reshape(len(m.y),1)), axis=1)[0:100,:])
+
+#----------------testing_cycle--------------------------------------------
 temp = np.copy(m.y)
 
-
-m.evolve(10)
+m.cycle(0.01, num_step = int(5e4), track=346)
 
 print(np.concatenate((temp.reshape(len(temp),1), m.y.reshape(len(m.y),1)), axis=1)[0:10,:])
+
+m.visualize(0.01)
