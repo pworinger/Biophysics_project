@@ -1,6 +1,7 @@
 import pandas as pd
 import networkx as nx
 import numpy as np
+import math
 
 class Model():
     def __init__(self, path_edge_list="idea_ode_coefficients.tsv", path_node_id="idea_wide_format_data.txt"):
@@ -40,5 +41,15 @@ class Model():
     def initial_expression_level(self, size):
         return np.random.rand(size)
 
-    def evolve(self):
-        raise NotImplementedError
+    # def evolve(self, dt):
+    #     temp = np.copy(self.y)
+    #     for i in range(len(self.y)):
+    #         sum_ = sum(self.alpha[:,i]*(temp-1) + self.beta[:,i]*(temp[i]*temp-1))
+    #         self.y[i] = math.exp(dt*sum_/temp[i] + math.log(temp[i]))
+
+    def evolve(self, dt):
+        # want to multiply all edges going to zero with y
+        # those edges correspond to alpha[:,0]
+        # therefor we can transpose alpha and multiply it with y
+        sum_ = self.alpha.T @ (self.y - 1) + self.y * (self.beta.T @ self.y) - self.beta.T @ np.ones(len(self.y))
+        self.y = np.exp( dt*sum_/self.y) * self.y

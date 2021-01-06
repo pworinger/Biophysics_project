@@ -1,5 +1,6 @@
 import networkx as nx
 from model import Model
+import numpy as np
 
 m = Model()
 
@@ -15,5 +16,12 @@ m = Model()
 #     print(n)
 # print(m.graph.adj["STE12"]["SRY1"]["alpha"])
 
-print(type(m.alpha))
-print(m.alpha)
+# print(type(m.alpha))
+# print(m.alpha)
+
+temp = np.copy(m.y)
+
+
+m.evolve(10)
+
+print(np.concatenate((temp.reshape(len(temp),1), m.y.reshape(len(m.y),1)), axis=1)[0:10,:])
