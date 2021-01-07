@@ -1,0 +1,18 @@
+strict digraph  {
+CLN2 [fontsize=10, height="0.7", index=697, style=filled, width="0.7"];
+CLB2 [fontsize=10, height="0.7", index=687, style=filled, width="0.7"];
+SIC1 [fontsize=10, height="0.7", index=3979, style=filled, width="0.7"];
+CLB1 [fontsize=10, height="0.7", index=686, style=filled, width="0.7"];
+CDC20 [fontsize=10, height="0.7", index=600, style=filled, width="0.7"];
+CLB5 [fontsize=10, height="0.7", index=690, style=filled, width="0.7"];
+SWI5 [fontsize=10, height="0.7", index=4362, style=filled, width="0.7"];
+CLN1 [fontsize=10, height="0.7", index=696, style=filled, width="0.7"];
+CLB6 [fontsize=10, height="0.7", index=691, style=filled, width="0.7"];
+CLN3 [fontsize=10, height="0.7", index=698, style=filled, width="0.7"];
+MCM1 [fontsize=10, height="0.7", index=2162, style=filled, width="0.7"];
+CDH1 [fontsize=10, height="0.7", index=632, style=filled, width="0.7"];
+SWI5 -> CLB1  [alpha="-7.36837910333e-06", beta="0.0", color=red, len=3, penwidth="4.2997828433012035", sign=False, weight="7.36837910333e-06"];
+SWI5 -> CLB5  [alpha="0.00012195561709399998", beta="0.0", color=green, len=3, penwidth="7.106242277226623", sign=True, weight="0.00012195561709399998"];
+SWI5 -> CLN2  [alpha="0.000255307692715", beta="0.0", color=green, len=3, penwidth="7.845054548847844", sign=True, weight="0.000255307692715"];
+SWI5 -> SIC1  [alpha="0.00484158898805", beta="0.0", color=green, len=3, penwidth="10.787583342141097", sign=True, weight="0.00484158898805"];
+}
