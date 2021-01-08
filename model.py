@@ -3,6 +3,7 @@ import networkx as nx
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
 class Model():
     def __init__(self, path_edge_list="idea_ode_coefficients.tsv", path_node_id="idea_wide_format_data.txt", perturbed_gene = 0):
@@ -81,9 +82,16 @@ class Model():
         else:
             raise NotImplementedError
 
-    def visualize(self):
+    def visualize(self, legends):
         # if self.time_series in dir():
         t = np.linspace(0, len(self.time_series)*self.dt-self.dt, len(self.time_series))
-        plt.legend
-        plt.plot(t, self.time_series)
+        plt.xlabel('time [s]')
+        plt.ylabel('log relative expresssion []')
+        # matplotlib.style.use('seaborn')
+        colors = [cm.hsv(x) for x in np.linspace(0, 0.98, 12)]
+        for i in range(self.time_series.shape[1]):
+            plt.plot(t, np.log(self.time_series[:,i]), color=colors[i])
+        plt.ylim((0,100))
+        plt.legend(legends)
+        plt.savefig('expression_levels.png', dpi=300)
         plt.show()
