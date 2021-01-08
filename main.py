@@ -116,3 +116,18 @@ del cycles5
 # print(np.concatenate((temp.reshape(len(temp),1), m.y.reshape(len(m.y),1)), axis=1)[0:10,:])
 #
 # m.visualize(0.01)
+
+
+def rank_cycles(loops):
+    flat_list = [item for sublist in loops for item in sublist]
+    scores = []
+    for sublist in flat_list:
+        # score measures the strength of the loop
+        score = 1
+        previous = 'SWI5'
+        for node in sublist:
+            score = score * m.graph.get_edge_data(previous, node, default = 0)['alpha']
+            previous = node
+        scores.append(score)
+    scores.sort(reverse=True, key=abs)
+    return scores
