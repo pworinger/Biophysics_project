@@ -12,7 +12,8 @@ class Model():
         self.alpha = nx.adjacency_matrix(self.graph, nodelist=None, weight="alpha")
         self.beta = nx.adjacency_matrix(self.graph, nodelist=None, weight="beta")
         self.y = np.ones(self.graph.number_of_nodes())
-        #self.y[perturbed_gene] = np.random.uniform(0.8, 1.2)
+        self.y[perturbed_gene] = 1e2
+        # self.y[perturbed_gene] = np.random.uniform(0.8, 1.2)
         # self.y = self.initial_expression_level(self.graph.number_of_nodes())
 
     def create_full_graph(self, path_edge_list, path_node_id):
@@ -45,9 +46,9 @@ class Model():
         else:
             raise NotImplementedError
 
-    # def initial_expression_level(self, size, seed = 0):
-    #     np.random.seed(seed=seed)
-    #     return np.random.uniform(1e-3, 1 - 1e-3, size)
+    def initial_expression_level(self, size, seed = 0):
+        np.random.seed(seed=seed)
+        return np.random.uniform(0.5, 1.5, size)
 
     # def evolve(self, dt):
     #     temp = np.copy(self.y)
@@ -59,7 +60,7 @@ class Model():
         # want to multiply all edges going to zero with y
         # those edges correspond to alpha[:,0]
         # therefor we can transpose alpha and multiply it with y
-        sum_ = self.alpha.T @ (self.y - 1) + self.y * (self.beta.T @ self.y) - self.beta.T @ np.ones(len(self.y))
+        sum_ = self.alpha @ (self.y - 1) + self.y * (self.beta @ self.y) - self.beta @ np.ones(len(self.y))
         # self.y = np.exp(dt*sum_/self.y) * self.y
         # if we remove the log we can avoid dividing by y
         self.y = sum_*dt + self.y
@@ -68,19 +69,21 @@ class Model():
         # self.y = np.exp(dt*sum_/self.y) * self.y
         
         
-    def cycle(self, dt, track = 0, num_step = None):
+    def cycle(self, dt, track = [0], num_step = None):
         if num_step:
-            self.time_series = np.empty(num_step)
+            self.dt = dt
+            self.time_series = np.empty((num_step, len(track)))
             for i in range(num_step):
                 if (i+1) % int(num_step/10) ==0:
                     print(str((i+1)/num_step*100) + '% are done')
                 self.evolve(dt)
-                self.time_series[i] = self.y[track]
+                self.time_series[i,:] = self.y[track]
         else:
             raise NotImplementedError
 
-    def visualize(self, dt):
+    def visualize(self):
         # if self.time_series in dir():
-        t = np.linspace(0, len(self.time_series)*dt-dt, len(self.time_series))
+        t = np.linspace(0, len(self.time_series)*self.dt-self.dt, len(self.time_series))
+        plt.legend
         plt.plot(t, self.time_series)
         plt.show()
