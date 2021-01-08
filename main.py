@@ -121,13 +121,32 @@ del cycles5
 def rank_cycles(loops):
     flat_list = [item for sublist in loops for item in sublist]
     scores = []
-    for sublist in flat_list:
+    for idx, sublist in enumerate(flat_list):
         # score measures the strength of the loop
         score = 1
-        previous = 'SWI5'
+        previous = sublist[-1]
         for node in sublist:
             score = score * m.graph.get_edge_data(previous, node, default = 0)['alpha']
             previous = node
-        scores.append(score)
-    scores.sort(reverse=True, key=abs)
+        scores.append([score, idx])
+    scores.sort(reverse=True, key= lambda x: abs(x[0]))
     return scores
+
+with open("cycles3.pkl", "rb") as f:
+    cycles3 = pickle.load(f)
+
+with open("cycles4.pkl", "rb") as f:
+    cycles4 = pickle.load(f)
+
+with open("cycles5.pkl", "rb") as f:
+    cycles5 = pickle.load(f)
+
+rank_cycles(cycles3)[0:10]
+
+flat_list_3 = [item for sublist in cycles3 for item in sublist]
+print(flat_list_3[1421])
+
+rank_cycles(cycles4)[0:10]
+
+flat_list_4 = [item for sublist in cycles4 for item in sublist]
+print(flat_list_4[71834])
