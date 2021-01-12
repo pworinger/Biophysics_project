@@ -16,14 +16,23 @@ def draw(G, path_fig):
     nx.set_edge_attributes(G, edge_color, name="color")
 
     nx.set_node_attributes(G, "filled", name="style")
-    nx.set_node_attributes(G, "10", name="fontsize")
+    nx.set_node_attributes(G, "15", name="fontsize")
     #nx.set_node_attributes(G, True, name="fixedsize")
-    nx.set_node_attributes(G, 0.7, name="width")
-    nx.set_node_attributes(G, 0.7, name="height")
+    nx.set_node_attributes(G, 1, name="width")
+    nx.set_node_attributes(G, 1, name="height")
 
-    nx.set_edge_attributes(G, 3, name="len")
+    nx.set_edge_attributes(G, 6, name="len")
 
     nx.drawing.nx_pydot.write_dot(G, path_fig)
     graph_a = pydot.graph_from_dot_file(path_fig)
     graph_a[0].write_svg("images/" + path_fig + ".svg", prog="neato")
     print("done")
+
+
+from model import Model
+
+nodes = ['SWI5', 'DAL5', 'ASH1', 'PCL5', 'REE1', 'PCL5', 'UGA1', 'HO']
+nodes2 = ['SWI5', 'PRP9', 'CTR1', 'REE1', 'FRE1', 'PCL5']
+m = Model(nodes_subgraph=nodes2)
+
+draw(m.graph, "network2")

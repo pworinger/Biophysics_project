@@ -5,7 +5,7 @@ from model import Model
 from network_visualisation import draw
 
 
-m = Model(perturbed_gene=10)
+m = Model()
 
 # print(m.graph.nodes())
 # print(m.graph.edges())
@@ -42,10 +42,11 @@ print(nx.number_of_edges(m.graph))
 import pickle
 
 cycles3 = []
-for gene in nx.neighbors(m.graph, "SWI5"):
-    cycles3.append(list(nx.all_simple_paths(m.graph, source=gene, target="SWI5", cutoff=3)))
+for gene in nx.neighbors(m.graph, "DAL5"):
+    print(gene)
+    cycles3.append(list(nx.all_simple_paths(m.graph, source=gene, target="DAL5", cutoff=3)))
 
-with open('cycles3.pkl', 'wb') as f:
+with open('cycles3_DAL5.pkl', 'wb') as f:
     pickle.dump(cycles3, f)
 
 # del cycles3
@@ -59,9 +60,9 @@ with open('cycles3.pkl', 'wb') as f:
 #
 # cycles4 = []
 # for gene in (m.graph).neighbors("SWI5"):
-print(len(list((m.graph).successors("SWI5"))))
-print(len(list((m.graph).predecessors("SWI5"))))
-print(nx.is_directed(m.graph))
+#print(len(list((m.graph).successors("SWI5"))))
+#print(len(list((m.graph).predecessors("SWI5"))))
+#print(nx.is_directed(m.graph))
 #     cycles4.append(list(nx.all_simple_paths(m.graph, source=gene, target="SWI5", cutoff=4)))
 #
 # with open('cycles4.pkl', 'wb') as f:
@@ -86,11 +87,11 @@ print(nx.is_directed(m.graph))
 print("55555555555555555555555555555555555555555555555555555555555555555555555")
 
 cycles5 = []
-for gene in (m.graph).predecessors("SWI5"):
+for gene in (m.graph).predecessors("DAL5"):
     print(gene)
-    cycles5.append(list(nx.all_simple_paths(m.graph, source="SWI5", target=gene, cutoff=5)))
+    cycles5.append(list(nx.all_simple_paths(m.graph, source="DAL5", target=gene, cutoff=5)))
 
-with open('cycles5.pkl', 'wb') as f:
+with open('cycles5_DAL5.pkl', 'wb') as f:
     pickle.dump(cycles5, f)
 
 del cycles5
@@ -117,6 +118,7 @@ del cycles5
 #
 # m.visualize(0.01)
 
+raise NotImplemented
 
 def rank_cycles(loops):
     flat_list = [item for sublist in loops for item in sublist]
