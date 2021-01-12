@@ -6,10 +6,13 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 class Model():
-    def __init__(self, path_edge_list="idea_ode_coefficients.tsv", path_node_id="idea_wide_format_data.txt", perturbed_gene = 0):
+    def __init__(self, path_edge_list="idea_ode_coefficients.tsv", path_node_id="idea_wide_format_data.txt", nodes_subgraph=[], perturbed_gene = 0):
         full_graph = self.create_full_graph(path_edge_list, path_node_id)
         #self.graph = self.create_subgraph(full_graph)
-        self.graph = full_graph
+        if nodes_subgraph !=[]:
+            self.graph = full_graph.subgraph(nodes_subgraph)
+        else:
+            self.graph = full_graph
         self.alpha = nx.adjacency_matrix(self.graph, nodelist=None, weight="alpha")
         self.beta = nx.adjacency_matrix(self.graph, nodelist=None, weight="beta")
         self.y = np.ones(self.graph.number_of_nodes())
