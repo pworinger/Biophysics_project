@@ -90,8 +90,11 @@ class Model():
         # matplotlib.style.use('seaborn')
         colors = [cm.hsv(x) for x in np.linspace(0, 0.98, 12)]
         for i in range(self.time_series.shape[1]):
-            plt.plot(t, np.log(self.time_series[:,i]), color=colors[i])
+            plt.plot(t, np.log(self.time_series[:,i]), color=colors[i], )
         plt.ylim((0,100))
         plt.legend(legends)
         plt.savefig('expression_levels.png', dpi=300)
+        plt.yscale('log')
+        plt.xlim((0,1850))
+        plt.ylim((1e-13,2))
         plt.show()
