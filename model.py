@@ -71,13 +71,18 @@ class Model():
         # in the following I looked at what happened it I don't transpose alpha and beta
         # sum_ = self.alpha @ (self.y - 1) + self.y * (self.beta @ self.y) - self.beta @ np.ones(len(self.y))
         # self.y = np.exp(dt*sum_/self.y) * self.y
-        
-        
-    def cycle(self, dt, track = [0], num_step = None):
+
+    def cycle(self, dt, perturbed_gene, track = [0], num_step = None):
         if num_step:
+            self.y[perturbed_gene] = 1e1
             self.dt = dt
             self.time_series = np.empty((num_step, len(track)))
-            for i in range(num_step):
+
+            self.evolve(dt)
+            self.time_series[0, :] = self.y[track]
+
+            for i in range(1,num_step):
+                self.y[perturbed_gene] = 1
                 if (i+1) % int(num_step/10) ==0:
                     print(str((i+1)/num_step*100) + '% are done')
                 self.evolve(dt)
