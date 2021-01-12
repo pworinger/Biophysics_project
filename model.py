@@ -16,7 +16,7 @@ class Model():
         self.alpha = nx.adjacency_matrix(self.graph, nodelist=None, weight="alpha")
         self.beta = nx.adjacency_matrix(self.graph, nodelist=None, weight="beta")
         self.y = np.ones(self.graph.number_of_nodes())
-        self.y[perturbed_gene] = 1e2
+        self.y[perturbed_gene] = 1e1
         # self.y[perturbed_gene] = np.random.uniform(0.8, 1.2)
         # self.y = self.initial_expression_level(self.graph.number_of_nodes())
 
@@ -99,5 +99,5 @@ class Model():
         plt.savefig('expression_levels.png', dpi=300)
         plt.yscale('log')
         plt.xlim((0,1850))
-        plt.ylim((1e-13,2))
+        plt.ylim((1e-13,10))
         plt.show()
