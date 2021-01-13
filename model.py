@@ -89,6 +89,8 @@ class Model():
         plt.xlim((0, 1850))
         plt.xticks(np.arange(0, 1900, 100))
         plt.savefig('expression_levels.png', dpi=300)
+        plt.xlim((0,1850))
+        plt.ylim((1e-13,10))
         plt.show()
 
     def draw(self, file_name):
