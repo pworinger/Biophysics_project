@@ -54,20 +54,3 @@ def grow_subnetwork(network, seeds):
         #print(subnetwork_nodes)
         print("current modularity: ", stored_M)
     return subnetwork_nodes, M
-
-# ################################################################################
-#
-# from model import Model
-#
-# m = Model()
-#
-# genes_12 = ['CLN3', 'SWI5', 'CLN1', 'CLN2', 'CDH1',  'CDC20', 'CLB5', 'CLB6', 'SIC1', 'CLB1', 'CLB2', 'MCM1']
-#
-# subN, M = grow_subnetwork(m.graph, genes_12)
-#
-# print(len(list(subN)))
-#
-# import pickle
-#
-# with open('subN_with12.pkl', 'wb') as f:
-#     pickle.dump(subN, f)
