@@ -16,6 +16,9 @@ class Model():
         self.beta = nx.adjacency_matrix(self.graph, nodelist=None, weight="beta")
         self.y = np.ones(self.graph.number_of_nodes())
 
+    # this function load the data from the tsv files whose paths are provided as arguments
+    # and convert the dataframe containing edge list to a networkx object,
+    # putting alpha and beta values as attributes of the edges
     def create_full_graph(self, path_edge_list, path_node_id):
         df = pd.read_csv(path_edge_list, sep="\t")
         df.columns = ["cause", "effect", "alpha", "beta"]
@@ -35,10 +38,12 @@ class Model():
         # those edges correspond to alpha[:,0]
         # therefor we can transpose alpha and multiply it with y
         sum_ = self.alpha @ (self.y - 1) + self.y * (self.beta @ self.y) - self.beta @ np.ones(len(self.y))
-        # self.y = np.exp(dt*sum_/self.y) * self.y
         # if we remove the log we can avoid dividing by y
         self.y = sum_*dt + self.y
 
+    # this function apply an impulsive perturbation to the perturbed_gene
+    # and let the system evolve, while monitoring the expression levels for
+    # the genes listed in track argument
     def cycle(self, dt, perturbed_gene, track = [0], num_step = None):
         perturbed_gene_index = self.graph.node[perturbed_gene]['index']
         if num_step:
@@ -56,25 +61,10 @@ class Model():
                 self.evolve(dt)
                 self.time_series[i, :] = self.y[track]
         else:
+            print("")
             raise NotImplementedError
 
-    def visualize_double_log(self, legends):
-        t = np.linspace(0, len(self.time_series)*self.dt-self.dt, len(self.time_series))
-        plt.figure(figsize=(10, 7))
-        plt.xlabel('time [minutes]')
-        plt.ylabel('log relative expresssion []')
-        colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple',
-                  'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan', "gold", "black"]
-        for i in range(self.time_series.shape[1]):
-            plt.plot(t, np.log(self.time_series[:,i]), color=colors[i])
-        plt.legend(legends)
-        plt.yscale('log')
-        plt.xlim((0, 1850))
-        plt.ylim((1e-20, 10 ))
-        plt.xticks(np.arange(0, 1900, 100))
-        plt.savefig('expression_levels_double_log.png', dpi=300)
-        plt.show()
-
+    # this function is used to create a plot of the data collected when running cycle function
     def visualize(self, legends):
         plt.figure(figsize=(10, 7))
         t = np.linspace(0, len(self.time_series) * self.dt - self.dt, len(self.time_series))
@@ -93,6 +83,28 @@ class Model():
         plt.ylim((0.999, 1.001))
         plt.show()
 
+    # this function is used to create a plot of the data collected when running cycle function,
+    # after applying log to the expression levels and using log scale on y-axis
+    # to enable to see oscillations despite fast divergence
+    def visualize_double_log(self, legends):
+        t = np.linspace(0, len(self.time_series)*self.dt-self.dt, len(self.time_series))
+        plt.figure(figsize=(10, 7))
+        plt.xlabel('time [minutes]')
+        plt.ylabel('log relative expresssion []')
+        colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple',
+                  'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan', "gold", "black"]
+        for i in range(self.time_series.shape[1]):
+            plt.plot(t, np.log(self.time_series[:,i]), color=colors[i])
+        plt.legend(legends)
+        plt.yscale('log')
+        plt.xlim((0, 1850))
+        plt.ylim((1e-20, 10 ))
+        plt.xticks(np.arange(0, 1900, 100))
+        plt.savefig('expression_levels_double_log.png', dpi=300)
+        plt.show()
+
+    # this function is used to create a .svg image representing the network
+    # a file in dot language is first created, and then used to generate the image
     def draw(self, file_name):
         G = self.graph
 
