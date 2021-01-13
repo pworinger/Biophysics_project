@@ -1,14 +1,13 @@
 import pandas as pd
 import networkx as nx
 import numpy as np
-import math
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
+import math
+import pydot
 
 class Model():
-    def __init__(self, path_edge_list="idea_ode_coefficients.tsv", path_node_id="idea_wide_format_data.txt", nodes_subgraph=[], perturbed_gene = 0):
+    def __init__(self, path_edge_list="idea_ode_coefficients.tsv", path_node_id="idea_wide_format_data.txt", nodes_subgraph=[]):
         full_graph = self.create_full_graph(path_edge_list, path_node_id)
-        #self.graph = self.create_subgraph(full_graph)
         if nodes_subgraph !=[]:
             self.graph = full_graph.subgraph(nodes_subgraph)
         else:
@@ -16,9 +15,6 @@ class Model():
         self.alpha = nx.adjacency_matrix(self.graph, nodelist=None, weight="alpha")
         self.beta = nx.adjacency_matrix(self.graph, nodelist=None, weight="beta")
         self.y = np.ones(self.graph.number_of_nodes())
-        #self.y[perturbed_gene] = 1e2
-        # self.y[perturbed_gene] = np.random.uniform(0.8, 1.2)
-        # self.y = self.initial_expression_level(self.graph.number_of_nodes())
 
     def create_full_graph(self, path_edge_list, path_node_id):
         df = pd.read_csv(path_edge_list, sep="\t")
@@ -34,32 +30,6 @@ class Model():
         nx.set_node_attributes(G, self.name_to_index, name="index")
         return G
 
-    lst = ['CLN3', 'SWI5', 'CLN1', 'CLN2', 'CDH1',  'CDC20', 'CLB5', 'CLB6', 'SIC1', 'CLB1', 'CLB2', 'MCM1']
-
-    def create_subgraph(self, full_graph, list_of_start_genes=lst, method="include_neighbours_at_max_distance", max_distance=1):
-        #print(self.name_to_index["SWI5"])
-        index_lst = [self.name_to_index[gene] for gene in list_of_start_genes]
-        if method == "include_neighbours_at_max_distance":
-            acc = set(list_of_start_genes)
-            for gene in list_of_start_genes: #index_lst:
-                if max_distance == 1:
-                    acc = acc.union(set(nx.all_neighbors(full_graph, gene)))
-                else:
-                    acc = acc.union(set(nx.ego_graph(full_graph, gene, radius=max_distance, center=True, undirected=True, distance=None).nodes()))
-            return full_graph.subgraph(list(acc))
-        else:
-            raise NotImplementedError
-
-    def initial_expression_level(self, size, seed = 0):
-        np.random.seed(seed=seed)
-        return np.random.uniform(0.5, 1.5, size)
-
-    # def evolve(self, dt):
-    #     temp = np.copy(self.y)
-    #     for i in range(len(self.y)):
-    #         sum_ = sum(self.alpha[:,i]*(temp-1) + self.beta[:,i]*(temp[i]*temp-1))
-    #         self.y[i] = math.exp(dt*sum_/temp[i] + math.log(temp[i]))
-
     def evolve(self, dt):
         # want to multiply all edges going to zero with y
         # those edges correspond to alpha[:,0]
@@ -68,41 +38,82 @@ class Model():
         # self.y = np.exp(dt*sum_/self.y) * self.y
         # if we remove the log we can avoid dividing by y
         self.y = sum_*dt + self.y
-        # in the following I looked at what happened it I don't transpose alpha and beta
-        # sum_ = self.alpha @ (self.y - 1) + self.y * (self.beta @ self.y) - self.beta @ np.ones(len(self.y))
-        # self.y = np.exp(dt*sum_/self.y) * self.y
 
     def cycle(self, dt, perturbed_gene, track = [0], num_step = None):
+        perturbed_gene_index = self.graph.node[perturbed_gene]['index']
         if num_step:
-            self.y[perturbed_gene] = 1e1
+            self.y[perturbed_gene_index] = 1.01
             self.dt = dt
             self.time_series = np.empty((num_step, len(track)))
 
             self.evolve(dt)
             self.time_series[0, :] = self.y[track]
 
+            self.y[perturbed_gene_index] = 1
             for i in range(1,num_step):
-                self.y[perturbed_gene] = 1
                 if (i+1) % int(num_step/10) ==0:
                     print(str((i+1)/num_step*100) + '% are done')
                 self.evolve(dt)
-                self.time_series[i,:] = self.y[track]
+                self.time_series[i, :] = self.y[track]
         else:
             raise NotImplementedError
 
-    def visualize(self, legends):
-        # if self.time_series in dir():
+    def visualize_double_log(self, legends):
         t = np.linspace(0, len(self.time_series)*self.dt-self.dt, len(self.time_series))
-        plt.xlabel('time [s]')
+        plt.figure(figsize=(10, 7))
+        plt.xlabel('time [minutes]')
         plt.ylabel('log relative expresssion []')
-        # matplotlib.style.use('seaborn')
-        colors = [cm.hsv(x) for x in np.linspace(0, 0.98, 12)]
+        colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple',
+                  'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan', "gold", "black"]
         for i in range(self.time_series.shape[1]):
-            plt.plot(t, np.log(self.time_series[:,i]), color=colors[i], )
-        plt.ylim((0,100))
+            plt.plot(t, np.log(self.time_series[:,i]), color=colors[i])
         plt.legend(legends)
-        plt.savefig('expression_levels.png', dpi=300)
         plt.yscale('log')
-        plt.xlim((0,1850))
-        plt.ylim((1e-13,2))
+        plt.xlim((0, 1850))
+        plt.ylim((1e-20, 10 ))
+        plt.xticks(np.arange(0, 1900, 100))
+        plt.savefig('expression_levels_double_log.png', dpi=300)
         plt.show()
+
+    def visualize(self, legends):
+        plt.figure(figsize=(10, 7))
+        t = np.linspace(0, len(self.time_series) * self.dt - self.dt, len(self.time_series))
+        plt.xlabel('time [minutes]')
+        plt.ylabel('relative expresssion []')
+        colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple',
+                  'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan', "gold", "black"]
+        for i in range(self.time_series.shape[1]):
+            plt.plot(t, (self.time_series[:, i]), color=colors[i], )
+        plt.ylim((1 - 0.001, 1 + 0.001))
+        plt.legend(legends)
+        plt.xlim((0, 1850))
+        plt.xticks(np.arange(0, 1900, 100))
+        plt.savefig('expression_levels.png', dpi=300)
+        plt.show()
+
+    def draw(self, file_name):
+        G = self.graph
+
+        width = {k: math.log(1E7 * v) for k, v in nx.get_edge_attributes(G, "weight").items()}
+        nx.set_edge_attributes(G, width, name="penwidth")
+
+        def get_color(b):
+            if b:
+                return "green"
+            else:
+                return "red"
+
+        edge_color = {k: get_color(v) for k, v in nx.get_edge_attributes(G, "sign").items()}
+        nx.set_edge_attributes(G, edge_color, name="color")
+
+        nx.set_node_attributes(G, "filled", name="style")
+        nx.set_node_attributes(G, "15", name="fontsize")
+        # nx.set_node_attributes(G, True, name="fixedsize")
+        nx.set_node_attributes(G, 1, name="width")
+        nx.set_node_attributes(G, 1, name="height")
+
+        nx.set_edge_attributes(G, 6, name="len")
+
+        nx.drawing.nx_pydot.write_dot(G, file_name)
+        graph_a = pydot.graph_from_dot_file(file_name)
+        graph_a[0].write_svg(+ file_name + ".svg", prog="neato")
