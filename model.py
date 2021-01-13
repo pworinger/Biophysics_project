@@ -89,8 +89,8 @@ class Model():
         plt.xlim((0, 1850))
         plt.xticks(np.arange(0, 1900, 100))
         plt.savefig('expression_levels.png', dpi=300)
-        plt.xlim((0,1850))
-        plt.ylim((1e-13,10))
+        plt.xlim((0, 1850))
+        plt.ylim((0.999, 1.001))
         plt.show()
 
     def draw(self, file_name):
@@ -118,4 +118,5 @@ class Model():
 
         nx.drawing.nx_pydot.write_dot(G, file_name)
         graph_a = pydot.graph_from_dot_file(file_name)
-        graph_a[0].write_svg(+ file_name + ".svg", prog="neato")
+        graph_a[0].write_svg(file_name + ".svg", prog="neato")
+        print("file '" + file_name+ ".svg' was successfully created")
